@@ -42,6 +42,38 @@ Allow: /`;
     });
   });
 
+  it('generates a robots.txt with multiple allows', function(done) {
+
+    const expected = `User-agent: *
+Allow: /
+Allow: /cgi-bin`;
+
+    const webpackConfig = {
+      entry: Path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: Path.join(__dirname, OUTPUT_PATH),
+        filename: 'index.js'
+      },
+      plugins: [new Plugin({
+        userAgents: [{
+          name: '*',
+          allow: ['/', '/cgi-bin']
+        }]
+      })]
+    };
+
+    webpack(webpackConfig, function(error, stats) {
+      expect(error).to.be.null;
+      expect(stats.hasErrors()).to.be.false;
+
+      fs.readFile(Path.join(__dirname, OUTPUT_PATH, 'robots.txt'), {encoding: 'utf8'}, function(fsError, data) {
+        expect(fsError).to.be.null;
+        expect(data).to.equal(expected);
+        done();
+      });
+    });
+  });
+
   it('generates a disallow robots.txt', function(done) {
 
     const expected = `User-agent: *
@@ -57,6 +89,38 @@ Disallow: /`;
         userAgents: [{
           name: '*',
           disallow: ['/']
+        }]
+      })]
+    };
+
+    webpack(webpackConfig, function(error, stats) {
+      expect(error).to.be.null;
+      expect(stats.hasErrors()).to.be.false;
+
+      fs.readFile(Path.join(__dirname, OUTPUT_PATH, 'robots.txt'), {encoding: 'utf8'}, function(fsError, data) {
+        expect(fsError).to.be.null;
+        expect(data).to.equal(expected);
+        done();
+      });
+    });
+  });
+
+  it('generates a robots.txt with multiple disallows', function(done) {
+
+    const expected = `User-agent: *
+Disallow: /
+Disallow: /cgi-bin`;
+
+    const webpackConfig = {
+      entry: Path.join(__dirname, 'fixtures/index.js'),
+      output: {
+        path: Path.join(__dirname, OUTPUT_PATH),
+        filename: 'index.js'
+      },
+      plugins: [new Plugin({
+        userAgents: [{
+          name: '*',
+          disallow: ['/', '/cgi-bin']
         }]
       })]
     };
